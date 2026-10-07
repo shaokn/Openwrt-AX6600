@@ -199,20 +199,12 @@ CONFIG_PACKAGE_ksmbd-avahi-service=y
 CONFIG_PACKAGE_luci-app-ksmbd=y
 CONFIG_PACKAGE_luci-i18n-ksmbd-zh-cn=y
 
-# ---- samba4（用户态 SMB 服务端）----
+# ---- samba4（用户态 SMB 服务端）：不编入、不进固件，需要时从源直接 apk add ----
 # 与 ksmbd 包级不冲突：samba4-server 的 CONFLICTS 只写了 samba36-server（上古包），
 # ksmbd-server 没有任何 CONFLICTS，两个 luci app 也互不冲突。
 # 唯一的冲突是运行期都要监听 445/139 ⇒ 两个服务只能开一个。
-# 因此这里用 =m：编出 .apk 但不装进固件（默认仍走 ksmbd），需要时 apk add 即可。
-# 注：samba4 自身对内核零依赖（DEPENDS 全是用户态库），
-#     SMB 服务端所需内核模块已由 kmod-fs-ksmbd 整串带入，不需要额外烘 kmod。
-CONFIG_PACKAGE_samba4-libs=m
-CONFIG_PACKAGE_samba4-server=m
-CONFIG_PACKAGE_samba4-client=m
-CONFIG_PACKAGE_samba4-admin=m
-CONFIG_PACKAGE_samba4-utils=m
-CONFIG_PACKAGE_luci-app-samba4=m
-CONFIG_PACKAGE_luci-i18n-samba4-zh-cn=m
+# samba4 自身对内核零依赖（DEPENDS 全是用户态库），SMB 服务端所需内核模块
+# 已由 kmod-fs-ksmbd 整串带入 ⇒ 从源安装不会缺内核模块，不必自己编。
 
 # ---- SMB/CIFS 客户端内核支持（挂载别人的 SMB 共享用）----
 # 服务端那套（nls-utf8 + crypto-cmac/des/md5/hmac/sha256/sha512/aead/ccm/gcm +
