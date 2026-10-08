@@ -218,8 +218,14 @@ CONFIG_PACKAGE_kmod-nft-tproxy=y
 CONFIG_PACKAGE_kmod-nft-socket=y
 
 # ---- btrfs ----
-CONFIG_KERNEL_BTRFS_FS=y
-CONFIG_KERNEL_BTRFS_FS_POSIX_ACL=y
+# ⚠️ 千万别再加 CONFIG_KERNEL_BTRFS_FS=y！
+#    include/kernel-defaults.mk:118 会把 .config 里 CONFIG_KERNEL_xxx 原样翻成内核
+#    CONFIG_xxx 追加进 .config.target ⇒ =y 就是把 btrfs 编译进内核本体（不是模块）。
+#    代价：内核镜像体积 +约 1.2~1.5MB（压缩后仍 +300~400KB），
+#    而三台 jdcloud 设备的内核分区只有 KERNEL_SIZE=6144k(6291456B)，
+#    直接爆掉：uImage.itb 6434880 > 6291456（2026-10-08 run 37704843511 三台全挂）。
+#    正确做法 = 只选 kmod 包，走 btrfs.ko 模块（ACL 由内核默认 y 的
+#    BTRFS_FS_POSIX_ACL 随模块编译进去，一样有）。
 CONFIG_PACKAGE_kmod-fs-btrfs=y
 CONFIG_PACKAGE_btrfs-progs=y
 # =====================================================================
